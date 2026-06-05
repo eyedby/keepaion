@@ -1,0 +1,96 @@
+import { ethers } from "hardhat";
+import { MerkleTree } from "merkletreejs";
+import { keccak256 } from "ethers";
+import * as fs from "fs";
+
+// ─────────────────────────────────────────────────────────────
+//  merkle.ts — Manage the keepAIon commitment tree
+//
+//  Add commitment:  npx ts-node scripts/merkle.ts add <commitment_hex>
+//  Get root:        npx ts-node scripts/merkle.ts root
+//  Get proof:       npx ts-node scripts/merkle.ts proof <commitment_hex>
+//  Push root:       npx ts-node scripts/merkle.ts push --network base-sepolia
+// ─────────────────────────────────────────────────────────────
+
+const TREE_FILE = "./merkle-state.json";
+
+interface TreeState {
+    leaves: string[];
+    root: string;
+    updatedAt: number;
+}
+
+function loadTree(): MerkleTree {
+    if (!fs.existsSync(TREE_FILE)) {
+        return new MerkleTree([], keccak256, { sortPairs: true });
+    }
+    const state: TreeState = JSON.parse(fs.readFileSync(TREE_FILE, "utf8"));
+    const leaves = state.leaves.map(l => Buffer.from(l.slice(2), "hex"));
+    return new MerkleTree(leaves, keccak256, { sortPairs: true });
+}
+
+function saveTree(tree: MerkleTree, leaves: string[]) {
+    const state: TreeState = {
+        leaves,
+        root: tree.getHexRoot(),
+        updatedAt: Date.now(),
+    };
+    fs.writeFileSync(TREE_FILE, JSON.stringify(state, null, 2));
+}
+
+export function addCommitment(commitment: string): string {
+    const state: TreeState = fs.existsSync(TREE_FILE)
+        ? JSON.parse(fs.readFileSync(TREE_FILE, "utf8"))
+        : { leaves: [], root: ethers.ZeroHash, updatedAt: 0 };
+
+    if (state.leaves.includes(commitment)) {
+        throw new Error("Commitment already in tree");
+    }
+
+    state.leaves.push(commitment);
+    const leaves = state.leaves.map(l => Buffer.from(l.slice(2), "hex"));
+    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+    saveTree(tree, state.leaves);
+
+    console.log(`✓ Added: ${commitment}`);
+    console.log(`  New root: ${tree.getHexRoot()}`);
+    return tree.getHexRoot();
+}
+
+export function getProof(commitment: string): {
+    pathIndices: number[];
+    hashPath: string[];
+    root: string;
+} {
+    const tree = loadTree();
+    const leaf = Buffer.from(commitment.slice(2), "hex");
+    const proof = tree.getProof(leaf);
+
+    const pathIndices = proof.map(p => (p.position === "right" ? 1 : 0));
+    const hashPath    = proof.map(p => "0x" + p.data.toString("hex"));
+
+    return {
+        pathIndices,
+        hashPath,
+        root: tree.getHexRoot(),
+    };
+}
+
+export function getRoot(): string {
+    const tree = loadTree();
+    const root = tree.getHexRoot();
+    console.log(`Current root: ${root === "" ? ethers.ZeroHash : root}`);
+    return root;
+}
+
+// CLI runner
+const [,, cmd, arg] = process.argv;
+if (cmd === "add" && arg)          addCommitment(arg);
+else if (cmd === "root")           getRoot();
+else if (cmd === "proof" && arg)   console.log(JSON.stringify(getProof(arg), null, 2));
+else {
+    console.log("Usage:");
+    console.log("  npx ts-node scripts/merkle.ts add <0xcommitment>");
+    console.log("  npx ts-node scripts/merkle.ts root");
+    console.log("  npx ts-node scripts/merkle.ts proof <0xcommitment>");
+}
