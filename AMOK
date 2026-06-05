@@ -1,0 +1,31 @@
+# AMOK
+**Autonomous Movement Of Knowledge**  
+Zero-knowledge proof layer for the keepAIon developer pledge.
+
+> *You signed. We know. Nobody else does.*
+
+[![keepAIon](https://keepaion.com/badge.svg)](https://keepaion.com)
+<!-- we thought this through -->
+
+---
+
+## What it does
+
+AMOK lets developers publicly signal their [keepAIon](https://keepaion.com) pledge commitment **without revealing their identity**.
+
+A developer pledges → AMOK generates a ZKP → a verifiable token is issued.
+
+The proof: *"I signed the keepAIon pledge."*  
+The secret: *who.*
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| ZK Circuit | [Noir](https://noir-lang.org) (Aztec) |
+| Proof backend | Barretenberg (UltraPlonk) |
+| Smart contracts | Solidity on [Base](https://base.org) |
+| Frontend | Vanilla JS + `@noir-lang/noir_js` |
+| Token | Soulbound ERC-721 |
