@@ -1,31 +1,311 @@
-# AMOK
-**Autonomous Movement Of Knowledge**  
-Zero-knowledge proof layer for the keepAIon developer pledge.
+# Basic Git Commands Guide
 
-> *You signed. We know. Nobody else does.*
-
-[![keepAIon](https://keepaion.com/badge.svg)](https://keepaion.com)
-<!-- we thought this through -->
+Git is a distributed version control system that tracks changes in your code and enables collaboration. This guide covers the most essential Git commands.
 
 ---
 
-## What it does
-
-AMOK lets developers publicly signal their [keepAIon](https://keepaion.com) pledge commitment **without revealing their identity**.
-
-A developer pledges → AMOK generates a ZKP → a verifiable token is issued.
-
-The proof: *"I signed the keepAIon pledge."*  
-The secret: *who.*
+## Table of Contents
+1. [git init](#git-init)
+2. [git clone](#git-clone)
+3. [git status](#git-status)
+4. [git add](#git-add)
+5. [git commit](#git-commit)
+6. [git push](#git-push)
+7. [git pull](#git-pull)
 
 ---
 
-## Stack
+## git init
 
-| Layer | Tech |
-|---|---|
-| ZK Circuit | [Noir](https://noir-lang.org) (Aztec) |
-| Proof backend | Barretenberg (UltraPlonk) |
-| Smart contracts | Solidity on [Base](https://base.org) |
-| Frontend | Vanilla JS + `@noir-lang/noir_js` |
-| Token | Soulbound ERC-721 |
+**Purpose**: Initialize a new Git repository in your project directory.
+
+**When to use**: When you're starting a new project and want to enable version control.
+
+### Example:
+```bash
+cd my-project
+git init
+```
+
+**Output**:
+```
+Initialized empty Git repository in /path/to/my-project/.git/
+```
+
+**What it does**: Creates a hidden `.git` folder that stores all version history and metadata.
+
+---
+
+## git clone
+
+**Purpose**: Create a local copy of a remote repository on your computer.
+
+**When to use**: When you want to download an existing project from GitHub or another Git host.
+
+### Example:
+```bash
+git clone https://github.com/username/repository.git
+```
+
+**Output**:
+```
+Cloning into 'repository'...
+remote: Enumerating objects: 42, done.
+Receiving objects: 100% (42/42), done.
+```
+
+**What it does**: Downloads the entire repository history and creates a working directory with all files.
+
+### Clone into a specific folder:
+```bash
+git clone https://github.com/username/repository.git my-folder
+```
+
+---
+
+## git status
+
+**Purpose**: Show the current state of your working directory and staging area.
+
+**When to use**: Frequently—to see what files have changed, what's staged for commit, etc.
+
+### Example:
+```bash
+git status
+```
+
+**Output**:
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        config.json
+
+nothing added to commit but untracked changes present (working directory)
+```
+
+**What it tells you**:
+- Current branch
+- Files modified but not staged
+- Files staged for commit
+- Untracked files (new files Git doesn't know about)
+
+---
+
+## git add
+
+**Purpose**: Stage changes (files) to be included in your next commit.
+
+**When to use**: After you've made changes and want to prepare them for committing.
+
+### Add a specific file:
+```bash
+git add README.md
+```
+
+### Add all changes:
+```bash
+git add .
+```
+
+### Add multiple files:
+```bash
+git add file1.js file2.js file3.js
+```
+
+### Add files matching a pattern:
+```bash
+git add *.js  # All JavaScript files
+```
+
+**What it does**: Moves files from "working directory" to "staging area" (ready to be committed).
+
+### Check what's staged:
+```bash
+git status
+```
+
+**Output**:
+```
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   config.json
+        modified:   README.md
+```
+
+---
+
+## git commit
+
+**Purpose**: Create a snapshot of your staged changes with a descriptive message.
+
+**When to use**: After staging files with `git add`, to save your work to the repository history.
+
+### Commit with a message:
+```bash
+git commit -m "Add user authentication feature"
+```
+
+**Output**:
+```
+[main a1b2c3d] Add user authentication feature
+ 2 files changed, 45 insertions(+), 12 deletions(-)
+```
+
+### Commit with a detailed message:
+```bash
+git commit -m "Add user authentication feature" -m "- Implemented login form
+- Added password hashing
+- Created session management"
+```
+
+### Commit and stage changes at the same time (tracked files only):
+```bash
+git commit -am "Fix bug in payment processing"
+```
+
+**What it does**: Records your changes permanently in the repository history with a timestamp and author information.
+
+---
+
+## git push
+
+**Purpose**: Upload your local commits to a remote repository (like GitHub).
+
+**When to use**: When you're ready to share your work with others or back up your commits.
+
+### Push to default branch:
+```bash
+git push
+```
+
+### Push to a specific branch:
+```bash
+git push origin main
+```
+
+### Push a new branch to remote:
+```bash
+git push -u origin feature-branch
+```
+*(The `-u` flag sets up tracking so future pushes don't need the branch name)*
+
+### Push all branches:
+```bash
+git push --all
+```
+
+**Output**:
+```
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 356 bytes, done.
+To https://github.com/username/repository.git
+   a1b2c3d..e4f5g6h  main -> main
+```
+
+**What it does**: Synchronizes your local commits with the remote repository so others can see your changes.
+
+---
+
+## git pull
+
+**Purpose**: Download and integrate remote changes into your local repository.
+
+**When to use**: When your teammates have pushed new commits and you want to update your local copy.
+
+### Pull from default branch:
+```bash
+git pull
+```
+
+### Pull from a specific branch:
+```bash
+git pull origin main
+```
+
+**Output**:
+```
+remote: Enumerating objects: 3, done.
+Unpacking objects: 100% (3/3), done.
+From https://github.com/username/repository
+   e4f5g6h..x7y8z9a  main       -> origin/main
+Updating e4f5g6h..x7y8z9a
+Fast-forward
+ feature.js | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+```
+
+**What it does**: 
+1. Fetches remote changes
+2. Merges them into your current branch
+3. Updates your working directory
+
+---
+
+## Common Workflow Example
+
+Here's how these commands work together in a typical workflow:
+
+```bash
+# 1. Clone a repository
+git clone https://github.com/username/project.git
+cd project
+
+# 2. Check the current state
+git status
+
+# 3. Make changes to files (edit with your editor)
+
+# 4. Check what changed
+git status
+
+# 5. Stage your changes
+git add .
+
+# 6. Commit with a message
+git commit -m "Update documentation and fix typos"
+
+# 7. Push to remote
+git push origin main
+
+# 8. Later, pull updates from teammates
+git pull origin main
+```
+
+---
+
+## Tips & Best Practices
+
+- **Commit often**: Make small, logical commits with clear messages
+- **Pull before push**: Always `git pull` before `git push` to avoid conflicts
+- **Use descriptive messages**: Write commit messages that explain *why* you made changes, not just what changed
+- **Create branches**: Use `git branch` to work on features separately before merging
+- **Review changes**: Use `git status` and `git diff` frequently to verify your changes
+
+---
+
+## Quick Reference
+
+| Command | Purpose |
+|---------|---------|
+| `git init` | Initialize a new repository |
+| `git clone <url>` | Copy a remote repository |
+| `git status` | View current state |
+| `git add <file>` | Stage changes |
+| `git commit -m "message"` | Save staged changes |
+| `git push` | Upload commits to remote |
+| `git pull` | Download and merge remote changes |
+
+---
+
+For more information, visit the [official Git documentation](https://git-scm.com/doc).
